@@ -1,3 +1,4 @@
+
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -6,8 +7,8 @@ const hostname = '192.168.56.1';
 const port = 3000;
 
 const server = http.createServer((req, res) => {
-    if (req.url === '/' || req.url === '/index.html') {
-        const filePath = path.join(__dirname, 'index.html');
+    if (req.url === '/' || req.url === '/Cover Template for Bootstrap.html') {
+        const filePath = path.join(__dirname, 'Cover Template for Bootstrap.html');
         fs.readFile(filePath, (err, data) => {
             if (err) {
                 res.statusCode = 500;
