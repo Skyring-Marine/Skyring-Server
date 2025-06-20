@@ -222,7 +222,6 @@ async function enviarArchivo() {
 // linux-server.js
 
 const multer = require('multer');
-const path = require('path');
 
 const app = express();
 const upload = multer({ dest: 'uploads/' }); // Guardará en ./uploads
