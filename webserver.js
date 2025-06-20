@@ -14,19 +14,20 @@ const dbName = 'myproject';
 
 let db;
 
-// Conectar a MongoDB
-MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(client => {
-        console.log('Conectado a MongoDB');
-        db = client.db(dbName);
+// Conectar a MongoDB     
 
-        server.listen(port, hostname, () => {
-            console.log(`Servidor corriendo en http://${hostname}:${port}/`);
-        });
-    })
-    .catch(err => {
-        console.error('Error de conexión a MongoDB:', err);
-    });
+//MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+ //   .then(client => {
+  //      console.log('Conectado a MongoDB');
+   //     db = client.db(dbName);
+
+//        server.listen(port, hostname, () => {
+ //           console.log(`Servidor corriendo en http://${hostname}:${port}/`);
+  //      });
+  //  })
+  //  .catch(err => {
+   //     console.error('Error de conexión a MongoDB:', err);
+   // });
 
 
               // seccion para insertar objeto
