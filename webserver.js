@@ -203,22 +203,22 @@ fs.watch(carpeta, (eventType, filename) => {
 
 // windows-client.js
 
-const axios = require('axios');
-const FormData = require('form-data');
+//const axios = require('axios');
+// const FormData = require('form-data');
 
-async function enviarArchivo() {
-    const form = new FormData();
-    form.append('file', fs.createReadStream('ruta/a/tu/archivo.csv'));
+// async function enviarArchivo() {
+ //   const form = new FormData();
+ //   form.append('file', fs.createReadStream('ruta/a/tu/archivo.csv'));
 
-    try {
-        const respuesta = await axios.post('http://IP_DEL_SERVIDOR_LINUX:3000/upload', form, {
-            headers: form.getHeaders()
-        });
-        console.log(respuesta.data);
-    } catch (error) {
-        console.error('Error al enviar el archivo:', error.message);
-    }
-}
+//    try {
+ //       const respuesta = await axios.post('http://IP_DEL_SERVIDOR_LINUX:3000/upload', form, {
+  //          headers: form.getHeaders()
+   //     });
+   //     console.log(respuesta.data);
+  //  } catch (error) {
+  //      console.error('Error al enviar el archivo:', error.message);
+  //  }
+//}
 
 //enviarArchivo();
 
