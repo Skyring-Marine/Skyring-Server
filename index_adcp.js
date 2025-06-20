@@ -204,7 +204,7 @@ const FormData = require('form-data');
 
 async function enviarArchivo() {
     const form = new FormData();
-    form.append('file', fs.createReadStream('ruta/a/tu/archivo.csv'));
+    form.append('file', fs.createReadStream('C:\\Users\\Asus\\OneDrive\\Desktop\\Test_ADCP\\camaninv17_000_000_TS1707111200_LOG8.TXT'));
 
     try {
         const respuesta = await axios.post('http://192.168.1.12:3000/upload', form, {
