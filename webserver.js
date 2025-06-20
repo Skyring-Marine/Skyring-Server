@@ -159,7 +159,7 @@ async function obtenerDatosSpotter() {
 
 
 
-const carpeta = 'C:\\Users\\Asus\\OneDrive\\Desktop\\Test_ADCP';
+const carpeta = '/home/skyring/Skyring-Server/transferencia2';
 
 fs.readdir(carpeta, (err, archivos) => {
   if (err) {
