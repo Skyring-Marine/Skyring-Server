@@ -216,4 +216,20 @@ async function enviarArchivo() {
     }
 }
 
-enviarArchivo();
+//enviarArchivo();
+
+
+// linux-server.js
+
+const multer = require('multer');
+const path = require('path');
+
+const app = express();
+const upload = multer({ dest: 'uploads/' }); // Guardará en ./uploads
+
+app.post('/upload', upload.single('file'), (req, res) => {
+    console.log('Archivo recibido:', req.file.originalname);
+    res.send('Archivo recibido correctamente');
+});
+
+app.listen(3000, () => console.log('Servidor escuchando en puerto 3000'));
