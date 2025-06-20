@@ -207,7 +207,7 @@ async function enviarArchivo() {
     form.append('file', fs.createReadStream('ruta/a/tu/archivo.csv'));
 
     try {
-        const respuesta = await axios.post('http://IP_DEL_SERVIDOR_LINUX:3000/upload', form, {
+        const respuesta = await axios.post('http://192.168.1.12:3000/upload', form, {
             headers: form.getHeaders()
         });
         console.log(respuesta.data);
