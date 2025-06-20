@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { MongoClient } = require('mongodb');
 
-const hostname = '192.168.0.19';
+const hostname = '192.168.1.11';
 const port = 3000;
 
 const url = 'mongodb://127.0.0.1:27017';
@@ -25,6 +25,9 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     .catch(err => {
         console.error('Error de conexión a MongoDB:', err);
     });
+
+
+              // seccion para insertar objeto
 
 const server = http.createServer((req, res) => {
     if (req.url === '/' || req.url === '/Cover Template for Bootstrap.html') {
@@ -106,3 +109,51 @@ const server = http.createServer((req, res) => {
         res.end('Página no encontrada');
     }
 });
+
+
+
+
+// archivo: server.js
+
+
+
+
+
+//seccion de solicitud a la API//
+
+
+// archivo: server.js (usando CommonJS y node-fetch v2)
+const fetch = require('node-fetch');
+
+async function obtenerDatosSpotter() {
+  try {
+    const response = await fetch("https://api.sofarocean.com/api/latest-data?spotterId=SPOT-32394C", {
+      method: "GET",
+      headers: {
+        "token": "456debbae1201b1142d2004657e83f"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    console.log("=== Datos completos ===");
+    console.log(JSON.stringify(data, null, 2));
+
+    console.log("\n=== Contenido de 'track' ===");
+    console.log(JSON.stringify(data.data.track, null, 2));
+
+    console.log("\n=== Contenido de 'waves' ===");
+    console.log(JSON.stringify(data.data.waves, null, 2));
+  } catch (error) {
+    console.error("Error al obtener datos del Spotter:", error.message);
+  }
+}
+
+// Ejecutar la función cada 5 segundos
+setInterval(obtenerDatosSpotter, 5000); // 5000 ms = 5 segundos
+
+

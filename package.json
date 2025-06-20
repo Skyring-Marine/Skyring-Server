@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/Skyring-Marine/Skyring-Server#readme",
   "dependencies": {
-    "mongodb": "^6.16.0"
+    "axios": "^1.10.0",
+    "mongodb": "^6.16.0",
+    "node-fetch": "^2.7.0"
   }
 }
