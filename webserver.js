@@ -163,7 +163,7 @@ async function obtenerDatosSpotter() {
 
 
 
-const carpeta = '/home/skyring/Skyring-Server/transferencia2';
+const carpeta = '/home/ubuntu/Skyring-Server/transferencia2';
 
 fs.readdir(carpeta, (err, archivos) => {
   if (err) {
@@ -228,7 +228,18 @@ fs.watch(carpeta, (eventType, filename) => {
 const multer = require('multer');
 
 const app = express();
-const upload = multer({ dest: 'uploads/' }); // Guardará en ./uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    }
+});
+
+const upload = multer({ storage });
+
+ // Guardará en ./uploads
 
 app.post('/upload', upload.single('file'), (req, res) => {
     console.log('Archivo recibido:', req.file.originalname);

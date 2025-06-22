@@ -207,7 +207,7 @@ async function enviarArchivo() {
     form.append('file', fs.createReadStream('C:\\Users\\Asus\\OneDrive\\Desktop\\Test_ADCP\\camaninv17_000_000_TS1707111200_LOG8.TXT'));
 
     try {
-        const respuesta = await axios.post('http://192.168.1.12:3000/upload', form, {
+        const respuesta = await axios.post('http://3.17.27.40:3000/upload', form, {
             headers: form.getHeaders()
         });
         console.log(respuesta.data);
