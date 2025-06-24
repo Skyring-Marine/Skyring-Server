@@ -6,7 +6,7 @@ const { MongoClient } = require('mongodb');
 const express = require('express');
 //test test
 
-const hostname = '192.168.1.11';
+const hostname = '192.168.1.7';
 const port = 3000;
 
 const url = 'mongodb://127.0.0.1:27017';
@@ -16,18 +16,18 @@ let db;
 
 // Conectar a MongoDB     
 
-//MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
- //   .then(client => {
-  //      console.log('Conectado a MongoDB');
-   //     db = client.db(dbName);
+MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+   .then(client => {
+      console.log('Conectado a MongoDB');
+     db = client.db(dbName);
 
-//        server.listen(port, hostname, () => {
- //           console.log(`Servidor corriendo en http://${hostname}:${port}/`);
-  //      });
-  //  })
-  //  .catch(err => {
-   //     console.error('Error de conexión a MongoDB:', err);
-   // });
+        server.listen(port, hostname, () => {
+           console.log(`Servidor corriendo en http://${hostname}:${port}/`);
+      });
+  })
+  .catch(err => {
+     console.error('Error de conexión a MongoDB:', err);
+ });
 
 
               // seccion para insertar objeto
@@ -163,7 +163,13 @@ async function obtenerDatosSpotter() {
 
 
 
-const carpeta = '/home/ubuntu/Skyring-Server/transferencia2';
+
+//const carpeta = '/home/ubuntu/Skyring-Server/transferencia2';
+//const carpeta2 = '/home/ubuntu/Skyring-Server/uploads';
+
+const carpeta = 'C:\\Users\\Asus\\OneDrive\\Documents\\GitHub\\Skyring-Server\\transferencia2';
+
+
 
 fs.readdir(carpeta, (err, archivos) => {
   if (err) {
@@ -185,7 +191,7 @@ fs.readdir(carpeta, (err, archivos) => {
 });
 
 
-
+// watchdog de la carpeta transferencias2
 
 console.log(`🕵️ Observando la carpeta: ${carpeta} ...`);
 
@@ -199,6 +205,61 @@ fs.watch(carpeta, (eventType, filename) => {
     }
   }
 });
+
+
+//watchdog 2
+const { exec } = require('child_process');
+
+//const carpeta2 = 'C:/Users/Asus/OneDrive/Documents/GitHub/Skyring-Server/uploads';
+const carpeta2 = 'C:\\Users\\Asus\\OneDrive\\Documents\\GitHub\\Skyring-Server\\uploads';
+
+console.log(`🕵️ Observando la carpeta: ${carpeta2} ...`);
+
+fs.watch(carpeta2, (eventType, filename) => {
+  if (filename) {
+    const extension = path.extname(filename).toLowerCase();
+
+    if (extension === '.txt') {
+      const fullPath = path.join(carpeta2, filename);
+      const tipo = eventType === 'rename' ? 'creado o eliminado' : 'modificado';
+      console.log(`📄 Archivo .txt ${tipo}: ${filename}`);
+
+      // Ejecutar el script Python
+      const command = `python formato8.py "${fullPath}"`;
+      
+      exec(command, (error, stdout, stderr) => {
+  if (error) {
+    console.error(`❌ Error al ejecutar Python: ${error.message}`);
+    return;
+  }
+  if (stderr) {
+    console.error(`⚠️ STDERR: ${stderr}`);
+  }
+
+  console.log(`✅ Salida del script Python:\n${stdout}`);
+
+  try {
+    const jsonObjects = stdout
+      .split(/(?<=\})\s*(?=\{)/g)
+      .map(objStr => objStr.trim());
+
+    const parsedObjects = jsonObjects.map(objStr => JSON.parse(objStr));
+
+    console.log("📊 Objetos JSON parseados:");
+    parsedObjects.forEach((obj, index) => {
+      console.log(`--- Burst #${obj["Burst#"]} ---`);
+      console.dir(obj, { depth: null });
+    });
+  } catch (parseError) {
+    console.error("❌ Error al parsear la salida JSON:", parseError.message);
+  }
+});
+
+      
+    }
+  }
+});
+
 
 
 // windows-client.js
@@ -247,3 +308,4 @@ app.post('/upload', upload.single('file'), (req, res) => {
 });
 
 app.listen(3000, () => console.log('Servidor escuchando en puerto 3000'));
+
