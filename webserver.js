@@ -2,18 +2,16 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { MongoClient } = require('mongodb');
-
 const express = require('express');
 //test test
-
 const hostname = '192.168.1.7';
 const port = 3000;
-
 const url = 'mongodb://127.0.0.1:27017';
 const dbName = 'myproject';
-
 let db;
-
+//DIRECTORIOS
+const carpeta = '/home/ubuntu/Skyring-Server/transferencia2';
+const carpeta2 = '/home/ubuntu/Skyring-Server/uploads';
 // Conectar a MongoDB     
 
 MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -29,9 +27,7 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
      console.error('Error de conexión a MongoDB:', err);
  });
 
-
-              // seccion para insertar objeto
-
+// seccion para insertar objeto
 const server = http.createServer((req, res) => {
     if (req.url === '/' || req.url === '/Cover Template for Bootstrap.html') {
         const filePath = path.join(__dirname, 'Cover Template for Bootstrap.html');
@@ -114,17 +110,8 @@ const server = http.createServer((req, res) => {
 });
 
 
-
-
 // archivo: server.js
-
-
-
-
-
 //seccion de solicitud a la API//
-
-
 // archivo: server.js (usando CommonJS y node-fetch v2)
 const fetch = require('node-fetch');
 
@@ -156,20 +143,6 @@ async function obtenerDatosSpotter() {
   }
 }
 
-// Ejecutar la función cada 5 segundos
-//setInterval(obtenerDatosSpotter, 5000); // 5000 ms = 5 segundos
-
-
-
-
-
-
-//const carpeta = '/home/ubuntu/Skyring-Server/transferencia2';
-//const carpeta2 = '/home/ubuntu/Skyring-Server/uploads';
-
-const carpeta = '/home/ubuntu/Skyring-Server/transferencia2';
-
-
 
 fs.readdir(carpeta, (err, archivos) => {
   if (err) {
@@ -190,7 +163,6 @@ fs.readdir(carpeta, (err, archivos) => {
   }
 });
 
-
 // watchdog de la carpeta transferencias2
 
 console.log(`🕵️ Observando la carpeta: ${carpeta} ...`);
@@ -210,8 +182,6 @@ fs.watch(carpeta, (eventType, filename) => {
 //watchdog 2
 const { exec } = require('child_process');
 
-//const carpeta2 = 'C:/Users/Asus/OneDrive/Documents/GitHub/Skyring-Server/uploads';
-const carpeta2 = '/home/ubuntu/Skyring-Server/uploads';
 
 console.log(`🕵️ Observando la carpeta: ${carpeta2} ...`);
 
