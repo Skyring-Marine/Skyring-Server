@@ -27,6 +27,8 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
      console.error('Error de conexión a MongoDB:', err);
  });
 
+
+/*
 // seccion para insertar objeto
 const server = http.createServer((req, res) => {
     if (req.url === '/' || req.url === '/Cover Template for Bootstrap.html') {
@@ -109,7 +111,7 @@ const server = http.createServer((req, res) => {
     }
 });
 
-
+*/
 // archivo: server.js
 //seccion de solicitud a la API//
 // archivo: server.js (usando CommonJS y node-fetch v2)
