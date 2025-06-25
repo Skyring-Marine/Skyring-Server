@@ -14,7 +14,7 @@ const carpeta = '/home/ubuntu/Skyring-Server/transferencia2';
 const carpeta2 = '/home/ubuntu/Skyring-Server/uploads';
 // Conectar a MongoDB     
 
-/*MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
    .then(client => {
       console.log('Conectado a MongoDB');
      db = client.db(dbName);
@@ -26,9 +26,9 @@ const carpeta2 = '/home/ubuntu/Skyring-Server/uploads';
   .catch(err => {
      console.error('Error de conexión a MongoDB:', err);
  });
-*/
 
-/*
+
+
 // seccion para insertar objeto
 const server = http.createServer((req, res) => {
     if (req.url === '/' || req.url === '/Cover Template for Bootstrap.html') {
@@ -111,7 +111,7 @@ const server = http.createServer((req, res) => {
     }
 });
 
-*/
+
 // archivo: server.js
 //seccion de solicitud a la API//
 // archivo: server.js (usando CommonJS y node-fetch v2)
