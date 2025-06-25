@@ -167,7 +167,7 @@ async function obtenerDatosSpotter() {
 //const carpeta = '/home/ubuntu/Skyring-Server/transferencia2';
 //const carpeta2 = '/home/ubuntu/Skyring-Server/uploads';
 
-const carpeta = 'C:\\Users\\Asus\\OneDrive\\Documents\\GitHub\\Skyring-Server\\transferencia2';
+const carpeta = '/home/ubuntu/Skyring-Server/transferencia2';
 
 
 
@@ -211,7 +211,7 @@ fs.watch(carpeta, (eventType, filename) => {
 const { exec } = require('child_process');
 
 //const carpeta2 = 'C:/Users/Asus/OneDrive/Documents/GitHub/Skyring-Server/uploads';
-const carpeta2 = 'C:\\Users\\Asus\\OneDrive\\Documents\\GitHub\\Skyring-Server\\uploads';
+const carpeta2 = '/home/ubuntu/Skyring-Server/uploads';
 
 console.log(`🕵️ Observando la carpeta: ${carpeta2} ...`);
 
