@@ -4,7 +4,7 @@ const path = require('path');
 const { MongoClient } = require('mongodb');
 const express = require('express');
 //test test
-const hostname = '192.168.1.7';
+const hostname = '172.31.39.213';
 const port = 3000;
 const url = 'mongodb://127.0.0.1:27017';
 const dbName = 'myproject';
