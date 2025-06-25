@@ -17,24 +17,35 @@ const carpeta2 = '/home/ubuntu/Skyring-Server/uploads';
 
 const app = express();
 
-// ==============================
+// =======================
 // Configuración de Multer
-// ==============================
+// =======================
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname);
-    }
+    destination: (req, file, cb) => cb(null, 'uploads/'),
+    filename: (req, file, cb) => cb(null, file.originalname)
 });
-
 const upload = multer({ storage });
 
-// ==============================
-// Rutas Express
-// ==============================
+// =======================
+// Conectar a MongoDB y levantar servidor
+// =======================
+MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(client => {
+        console.log('✅ Conectado a MongoDB');
+        db = client.db(dbName);
 
+        // Iniciar servidor Express SOLO después de MongoDB
+        app.listen(port, hostname, () => {
+            console.log(`🚀 Servidor corriendo en http://${hostname}:${port}/`);
+        });
+    })
+    .catch(err => {
+        console.error('❌ Error de conexión a MongoDB:', err);
+    });
+
+// =======================
+// Rutas Express
+// =======================
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'Cover Template for Bootstrap.html'));
 });
@@ -49,11 +60,7 @@ app.get('/crear', async (req, res) => {
             batteryPower: -0.24,
             solarVoltage: 0.11,
             humidity: 4,
-            track: [{
-                latitude: -18.4589833,
-                longitude: -70.3206667,
-                timestamp: "2025-05-29T23:40:00.000Z"
-            }],
+            track: [{ latitude: -18.4589833, longitude: -70.3206667, timestamp: "2025-05-29T23:40:00.000Z" }],
             waves: [{
                 significantWaveHeight: 1.06,
                 peakPeriod: 11.38,
@@ -74,7 +81,7 @@ app.get('/crear', async (req, res) => {
         const resultado = await db.collection('lecturas').insertOne(lectura);
         res.json({ mensaje: 'Lectura insertada', id: resultado.insertedId });
     } catch (err) {
-        console.error('Error al insertar en MongoDB:', err);
+        console.error('❌ Error al insertar en MongoDB:', err);
         res.status(500).send('Error al insertar lectura');
     }
 });
@@ -93,85 +100,55 @@ app.post('/upload', upload.single('file'), (req, res) => {
     res.send('Archivo recibido correctamente');
 });
 
-// ==============================
-// Conexión MongoDB y servidor Express
-// ==============================
-
-MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(client => {
-        console.log('✅ Conectado a MongoDB');
-        db = client.db(dbName);
-
-        app.listen(port, hostname, () => {
-            console.log(`🚀 Servidor corriendo en http://${hostname}:${port}/`);
-        });
-    })
-    .catch(err => {
-        console.error('❌ Error de conexión a MongoDB:', err);
-    });
-
-// ==============================
-// Watchdog Carpeta 1
-// ==============================
-
+// =======================
+// Watchdog Carpetas (Control simple para evitar bucles)
+// =======================
 console.log(`🕵️ Observando la carpeta: ${carpeta} ...`);
-
 fs.watch(carpeta, (eventType, filename) => {
     if (filename && path.extname(filename).toLowerCase() === '.txt') {
-        const tipo = eventType === 'rename' ? 'creado o eliminado' : 'modificado';
-        console.log(`📄 Archivo .txt ${tipo}: ${filename}`);
-        // Aquí tu función enviarArchivo si la implementas
+        console.log(`📄 Archivo en transferencia2 ${eventType}: ${filename}`);
+        // Aquí deberías implementar enviarArchivo si lo deseas
     }
 });
 
-// ==============================
-// Watchdog Carpeta 2 + Python
-// ==============================
-
 console.log(`🕵️ Observando la carpeta: ${carpeta2} ...`);
+const archivosProcesados = new Set();
 
 fs.watch(carpeta2, (eventType, filename) => {
     if (filename && path.extname(filename).toLowerCase() === '.txt') {
         const fullPath = path.join(carpeta2, filename);
-        const tipo = eventType === 'rename' ? 'creado o eliminado' : 'modificado';
-        console.log(`📄 Archivo .txt ${tipo}: ${filename}`);
+
+        if (archivosProcesados.has(fullPath)) return; // Prevenir bucles rápidos
+        archivosProcesados.add(fullPath);
+        setTimeout(() => archivosProcesados.delete(fullPath), 3000);
+
+        console.log(`📄 Archivo en uploads ${eventType}: ${filename}`);
 
         const command = `python3 formato8.py "${fullPath}"`;
 
         exec(command, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`❌ Error al ejecutar Python: ${error.message}`);
-                return;
-            }
-            if (stderr) {
-                console.error(`⚠️ STDERR: ${stderr}`);
-            }
+            if (error) return console.error(`❌ Error Python: ${error.message}`);
+            if (stderr) console.error(`⚠️ STDERR: ${stderr}`);
 
-            console.log(`✅ Salida del script Python:\n${stdout}`);
+            console.log(`✅ Salida Python:\n${stdout}`);
 
             try {
-                const jsonObjects = stdout
-                    .split(/(?<=\})\s*(?=\{)/g)
-                    .map(objStr => objStr.trim());
-
-                const parsedObjects = jsonObjects.map(objStr => JSON.parse(objStr));
-
-                console.log("📊 Objetos JSON parseados:");
-                parsedObjects.forEach((obj, index) => {
+                const jsonObjects = stdout.split(/(?<=\})\s*(?=\{)/g).map(obj => JSON.parse(obj.trim()));
+                console.log("📊 Objetos parseados:");
+                jsonObjects.forEach((obj, index) => {
                     console.log(`--- Burst #${obj["Burst#"]} ---`);
                     console.dir(obj, { depth: null });
                 });
             } catch (parseError) {
-                console.error("❌ Error al parsear la salida JSON:", parseError.message);
+                console.error("❌ Error parseando JSON:", parseError.message);
             }
         });
     }
 });
 
-// ==============================
-// Función opcional para obtener datos externos
-// ==============================
-
+// =======================
+// Función opcional obtener datos externos
+// =======================
 async function obtenerDatosSpotter() {
     try {
         const response = await fetch("https://api.sofarocean.com/api/latest-data?spotterId=SPOT-32394C", {
@@ -179,19 +156,12 @@ async function obtenerDatosSpotter() {
             headers: { "token": "456debbae1201b1142d2004657e83f" }
         });
 
-        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
 
         const data = await response.json();
-
         console.log("=== Datos completos ===");
         console.log(JSON.stringify(data, null, 2));
-
-        console.log("\n=== Contenido de 'track' ===");
-        console.log(JSON.stringify(data.data.track, null, 2));
-
-        console.log("\n=== Contenido de 'waves' ===");
-        console.log(JSON.stringify(data.data.waves, null, 2));
     } catch (error) {
-        console.error("Error al obtener datos del Spotter:", error.message);
+        console.error("Error obteniendo datos Spotter:", error.message);
     }
 }

@@ -19,7 +19,7 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
       console.log('Conectado a MongoDB');
      db = client.db(dbName);
 
-        server.listen(port, hostname, () => {
+        app.listen(port, hostname, () => {
            console.log(`Servidor corriendo en http://${hostname}:${port}/`);
       });
   })
@@ -29,7 +29,7 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
 
 
 
-// seccion para insertar objeto
+/*// seccion para insertar objeto
 const server = http.createServer((req, res) => {
     if (req.url === '/' || req.url === '/Cover Template for Bootstrap.html') {
         const filePath = path.join(__dirname, 'Cover Template for Bootstrap.html');
@@ -110,7 +110,7 @@ const server = http.createServer((req, res) => {
         res.end('Página no encontrada');
     }
 });
-
+*/
 
 // archivo: server.js
 //seccion de solicitud a la API//
