@@ -135,10 +135,17 @@ fs.watch(carpeta2, (eventType, filename) => {
             try {
                 const jsonObjects = stdout.split(/(?<=\})\s*(?=\{)/g).map(obj => JSON.parse(obj.trim()));
                 console.log("📊 Objetos parseados:");
-                jsonObjects.forEach((obj, index) => {
-                    console.log(`--- Burst #${obj["Burst#"]} ---`);
-                    console.dir(obj, { depth: null });
-                });
+              jsonObjects.forEach(async (obj, index) => {
+    console.log(`--- Burst #${obj["Burst#"]} ---`);
+    console.dir(obj, { depth: null });
+
+    try {
+        const resultado = await db.collection('burst').insertOne(obj);
+        console.log(`✅ Objeto Burst #${obj["Burst#"]} insertado con ID: ${resultado.insertedId}`);
+    } catch (insertErr) {
+        console.error(`❌ Error al insertar Burst #${obj["Burst#"]}:`, insertErr.message);
+    }
+});
             } catch (parseError) {
                 console.error("❌ Error parseando JSON:", parseError.message);
             }
