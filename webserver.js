@@ -195,7 +195,7 @@ fs.watch(carpeta2, (eventType, filename) => {
       console.log(`📄 Archivo .txt ${tipo}: ${filename}`);
 
       // Ejecutar el script Python
-      const command = `python formato8.py "${fullPath}"`;
+      const command = `python3 formato8.py "${fullPath}"`;
       
       exec(command, (error, stdout, stderr) => {
   if (error) {
