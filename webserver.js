@@ -14,7 +14,7 @@ const carpeta = '/home/ubuntu/Skyring-Server/transferencia2';
 const carpeta2 = '/home/ubuntu/Skyring-Server/uploads';
 // Conectar a MongoDB     
 
-MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+/*MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
    .then(client => {
       console.log('Conectado a MongoDB');
      db = client.db(dbName);
@@ -26,7 +26,7 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
   .catch(err => {
      console.error('Error de conexión a MongoDB:', err);
  });
-
+*/
 
 /*
 // seccion para insertar objeto
