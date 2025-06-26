@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-console.log('SERVER LIMPIO');
+console.log('✅ SERVER CON CUENTA DE REGISTROS ACTIVADO');
 
 MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(client => {
@@ -50,10 +50,26 @@ fs.watch(carpetaTransferencia, (eventType, filename) => {
 });
 
 console.log(`🕵️ Observando la carpeta: ${carpetaUploads} ...`);
+const archivosProcesados = new Set();
 
 fs.watch(carpetaUploads, (eventType, filename) => {
     if (!filename) return;
     if (filename !== archivoObjetivo) return;
 
+    const fullPath = path.join(carpetaUploads, filename);
+    if (archivosProcesados.has(fullPath)) return;
+
+    archivosProcesados.add(fullPath);
+    setTimeout(() => archivosProcesados.delete(fullPath), 3000);
+
     console.log(`📁 Archivo recibido en uploads ${eventType}: ${filename}`);
+
+    // Contar registros basados en <FINISH>
+    try {
+        const contenido = fs.readFileSync(fullPath, 'utf-8');
+        const registros = contenido.split('<FINISH>').filter(r => r.trim().length > 0);
+        console.log(`📊 Total de registros detectados: ${registros.length}`);
+    } catch (errLectura) {
+        console.error(`❌ Error leyendo el archivo: ${errLectura.message}`);
+    }
 });
