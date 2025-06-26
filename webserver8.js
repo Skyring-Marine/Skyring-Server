@@ -100,44 +100,30 @@ fs.watch(carpetaUploads, (eventType, filename) => {
                 if (error) return console.error(`❌ Error ejecutando Python: ${error.message}`);
                 if (stderr) console.error(`⚠️ STDERR: ${stderr}`);
 
-                if (!stdout.trim()) return console.warn("⚠️ El script Python no devolvió salida JSON válida.");
+                const lineas = stdout.trim().split(/\r?\n/);
+                const cantidadLinea = lineas.find(l => l.startsWith("CANTIDAD_REGISTROS="));
 
-                try {
-                    const jsonObjects = stdout.split(/(?<=\})\s*(?=\{)/g).map(obj => JSON.parse(obj.trim()));
-                    console.log(`📊 Procesando ${jsonObjects.length} registros del archivo ${filename}...`);
-
-                    const nRegistros = jsonObjects.filter(o => o["Burst#"]).map(o => o["Burst#"]);
-                    const existentes = await db.collection('registros').find({ n_registro: { $in: nRegistros } }).toArray();
-                    const existentesSet = new Set(existentes.map(e => e.n_registro));
-
-                    const registrosNuevos = jsonObjects.filter(o => o["Burst#"] && !existentesSet.has(o["Burst#"]));
-                    console.log(`🟢 Se encontraron ${registrosNuevos.length} registros nuevos que serán insertados.`);
-
-                    if (registrosNuevos.length === 0) {
-                        await db.collection('archivosProcesados').updateOne(
-                            { nombreArchivo: filename },
-                            { $set: { hash: hashActual, fecha: new Date() } },
-                            { upsert: true }
-                        );
-                        console.log(`✅ Hash del archivo ${filename} actualizado en la base de datos.`);
-                        return;
-                    }
-
-                    for (const obj of registrosNuevos) {
-                        obj["n_registro"] = obj["Burst#"];
-                        delete obj["Burst#"];
-                        try { await db.collection('registros').insertOne(obj); } catch (e) { console.error("❌ Error al insertar Registro:", e.message); }
-                    }
-
-                    console.log(`✔️ Insertados ${registrosNuevos.length} nuevos registros.`);
-                    await db.collection('archivosProcesados').updateOne(
-                        { nombreArchivo: filename },
-                        { $set: { hash: hashActual, fecha: new Date() } },
-                        { upsert: true }
-                    );
-                } catch (parseError) {
-                    console.error("❌ Error parseando JSON:", parseError.message);
+                if (!cantidadLinea) {
+                    console.warn("⚠️ El script no devolvió la cantidad de registros.");
+                    return;
                 }
+
+                const cantidad = parseInt(cantidadLinea.split("=")[1]);
+                console.log(`📊 El archivo ${filename} contiene ${cantidad} registros.`);
+
+                // Proceso de insertar en MongoDB, actualmente deshabilitado:
+                // try {
+                //     const jsonObjects = ... // Aquí iría la lógica de parseo e inserción
+                // } catch (parseError) {
+                //     console.error("❌ Error parseando JSON:", parseError.message);
+                // }
+
+                await db.collection('archivosProcesados').updateOne(
+                    { nombreArchivo: filename },
+                    { $set: { hash: hashActual, fecha: new Date() } },
+                    { upsert: true }
+                );
+                console.log(`✅ Hash del archivo ${filename} actualizado en la base de datos.`);
             });
 
         })
