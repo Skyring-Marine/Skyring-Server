@@ -38,7 +38,7 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
 
 // Ruta por defecto para mostrar index.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, '/Public/index.html'));
 });
 
 // Ruta adicional si quieres mantener acceso a tu plantilla anterior
