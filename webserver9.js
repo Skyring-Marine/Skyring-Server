@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { MongoClient } = require('mongodb');
 const multer = require('multer');
+const { exec } = require('child_process');
 
 const hostname = '172.31.39.213';
 const port = 3000;
@@ -22,7 +23,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-console.log('✅ SERVER CON PROCESO EN CASCADA');
+console.log('✅ SERVER CON PROCESO EXTERNO PYTHON');
 
 MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(client => {
@@ -58,16 +59,22 @@ fs.watch(carpetaUploads, (eventType, filename) => {
 
     console.log(`📁 Archivo recibido en uploads ${eventType}: ${filename}`);
 
-    clearTimeout(timer); // Reinicia el temporizador si siguen llegando eventos
+    clearTimeout(timer);
 
     timer = setTimeout(() => {
-        try {
-            const fullPath = path.join(carpetaUploads, filename);
-            const contenido = fs.readFileSync(fullPath, 'utf-8');
-            const registros = contenido.split('<FINISH>').filter(r => r.trim().length > 0);
-            console.log(`📊 Total de registros detectados: ${registros.length}`);
-        } catch (errLectura) {
-            console.error(`❌ Error leyendo el archivo: ${errLectura.message}`);
-        }
-    }, 2000); // Solo se procesa si no hubo nuevos eventos en los últimos 2 segundos
+        const fullPath = path.join(carpetaUploads, filename);
+        console.log(`🚀 Ejecutando verificación externa sobre: ${filename}`);
+
+        exec(`python3 verified.py "${fullPath}"`, (error, stdout, stderr) => {
+            if (error) {
+                return console.error(`❌ Error ejecutando Python: ${error.message}`);
+            }
+            if (stderr) {
+                console.error(`⚠️ STDERR: ${stderr}`);
+            }
+            if (stdout) {
+                console.log(`📊 Verificación Python: ${stdout.trim()}`);
+            }
+        });
+    }, 2000);
 });
