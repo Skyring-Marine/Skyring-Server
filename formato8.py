@@ -5,6 +5,9 @@ import sys
 def parse_line_to_json(line):
     values = line.strip().split(',')
 
+    if len(values) < 16:
+        raise ValueError("Línea incompleta")
+
     burst_number = int(values[0])
     timestamp = {
         "Year": values[1],
@@ -62,6 +65,7 @@ def parse_line_to_json(line):
         "Profile": filtered_profile
     }
 
+
 def main():
     parser = argparse.ArgumentParser(description="Parse wave log Format 8 to JSON")
     parser.add_argument("input_file", help="Path to the input .txt file")
@@ -70,6 +74,8 @@ def main():
     input_file = args.input_file
 
     registros = []
+    total_lineas = 0
+    lineas_invalidas = 0
 
     try:
         with open(input_file, 'r') as f:
@@ -77,13 +83,17 @@ def main():
 
         for line in lines:
             if line.strip():
+                total_lineas += 1
                 try:
                     result = parse_line_to_json(line)
                     registros.append(result)
                 except Exception as e:
+                    lineas_invalidas += 1
                     print(f"⚠️ Línea inválida omitida: {e}", file=sys.stderr)
 
-        print(f"CANTIDAD_REGISTROS={len(registros)}", file=sys.stderr)
+        print(f"CANTIDAD_TOTAL_LINEAS={total_lineas}", file=sys.stderr)
+        print(f"CANTIDAD_REGISTROS_VALIDOS={len(registros)}", file=sys.stderr)
+        print(f"CANTIDAD_LINEAS_INVALIDAS={lineas_invalidas}", file=sys.stderr)
 
         for registro in registros:
             print(json.dumps(registro))
@@ -92,6 +102,7 @@ def main():
         print(f"❌ Error: Archivo '{input_file}' no encontrado.", file=sys.stderr)
     except Exception as e:
         print(f"❌ Error inesperado: {e}", file=sys.stderr)
+
 
 if __name__ == "__main__":
     main()
