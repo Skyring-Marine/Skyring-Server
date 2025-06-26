@@ -6,7 +6,7 @@ def parse_line_to_json(line):
     values = line.strip().split(',')
 
     if len(values) < 16:
-        raise ValueError("Línea incompleta")
+        raise ValueError(f"Línea con columnas insuficientes: {len(values)}")
 
     burst_number = int(values[0])
     timestamp = {
@@ -81,15 +81,18 @@ def main():
         with open(input_file, 'r') as f:
             lines = f.readlines()
 
-        for line in lines:
+        print(f"📝 El archivo contiene {len(lines)} líneas.", file=sys.stderr)
+
+        for idx, line in enumerate(lines, 1):
             if line.strip():
+                print(f"[Línea {idx}] {line.strip()}", file=sys.stderr)
                 total_lineas += 1
                 try:
                     result = parse_line_to_json(line)
                     registros.append(result)
                 except Exception as e:
                     lineas_invalidas += 1
-                    print(f"⚠️ Línea inválida omitida: {e}", file=sys.stderr)
+                    print(f"⚠️ Línea {idx} inválida omitida: {e}", file=sys.stderr)
 
         print(f"CANTIDAD_TOTAL_LINEAS={total_lineas}", file=sys.stderr)
         print(f"CANTIDAD_REGISTROS_VALIDOS={len(registros)}", file=sys.stderr)
