@@ -67,13 +67,16 @@ fs.watch(carpetaUploads, (eventType, filename) => {
 
         exec(`python3 verified.py "${fullPath}"`, (error, stdout, stderr) => {
             if (error) {
-                return console.error(`❌ Error ejecutando Python: ${error.message}`);
+                console.error(`❌ Error ejecutando Python: ${error.message}`);
+                return;
             }
             if (stderr) {
                 console.error(`⚠️ STDERR: ${stderr}`);
             }
             if (stdout) {
                 console.log(`📊 Verificación Python: ${stdout.trim()}`);
+                console.log(`✅ Proceso terminado con éxito.`);
+                console.log(`🕐 Esperando actualización de archivo...`);
             }
         });
     }, 2000);
