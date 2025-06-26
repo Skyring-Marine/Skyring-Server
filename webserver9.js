@@ -11,6 +11,7 @@ const url = 'mongodb://127.0.0.1:27017';
 const dbName = 'myproject';
 let db;
 
+const carpetaTransferencia = path.join(__dirname, 'transferencia2');
 const carpetaUploads = path.join(__dirname, 'uploads');
 const archivoWaves = 'WAVES_000_000_LOG8.TXT';
 
@@ -40,6 +41,13 @@ app.post('/upload', upload.single('file'), (req, res) => {
     res.send('Archivo recibido correctamente');
 });
 
+console.log(`🕵️ Observando la carpeta: ${carpetaTransferencia} ...`);
+fs.watch(carpetaTransferencia, (eventType, filename) => {
+    if (filename && path.extname(filename).toLowerCase() === '.txt') {
+        console.log(`📄 Archivo en transferencia2 ${eventType}: ${filename}`);
+    }
+});
+
 console.log(`🕵️ Observando la carpeta: ${carpetaUploads} ...`);
 const archivosProcesados = new Set();
 
@@ -58,7 +66,6 @@ fs.watch(carpetaUploads, (eventType, filename) => {
     calcularHashArchivo(fullPath)
         .then(async (hashActual) => {
             const registroArchivo = await db.collection('archivosProcesados').findOne({ nombreArchivo: filename });
-
             if (registroArchivo && registroArchivo.hash === hashActual) {
                 console.log(`⚠️ Archivo ${filename} NO cambió. Saltando procesamiento.`);
                 return;
@@ -68,18 +75,26 @@ fs.watch(carpetaUploads, (eventType, filename) => {
 
             try {
                 const contenido = fs.readFileSync(fullPath, 'utf-8');
-                const lineas = contenido.split('\n').filter(line => line.trim() !== '');
-                console.log(`📊 El archivo ${filename} contiene ${lineas.length} registros.`);
+
+                const posiblesLineas = contenido.split(/\r?\n/);
+                const lineasValidas = posiblesLineas.filter(line => {
+                    const primerElemento = line.trim().split(',')[0];
+                    return /^\d+$/.test(primerElemento);
+                });
+
+                console.log(`📊 El archivo ${filename} contiene ${lineasValidas.length} registros válidos.`);
+
+                await db.collection('archivosProcesados').updateOne(
+                    { nombreArchivo: filename },
+                    { $set: { hash: hashActual, fecha: new Date() } },
+                    { upsert: true }
+                );
+                console.log(`✅ Hash del archivo ${filename} actualizado en la base de datos.`);
+
             } catch (e) {
                 console.error(`❌ Error leyendo el archivo ${filename}:`, e.message);
             }
 
-            await db.collection('archivosProcesados').updateOne(
-                { nombreArchivo: filename },
-                { $set: { hash: hashActual, fecha: new Date() } },
-                { upsert: true }
-            );
-            console.log(`✅ Hash del archivo ${filename} actualizado en la base de datos.`);
         })
         .catch(err => console.error(`❌ Error al calcular hash de ${filename}:`, err.message));
 });
