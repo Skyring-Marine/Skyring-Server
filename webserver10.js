@@ -17,6 +17,13 @@ const archivoObjetivo = 'WAVES_000_000_LOG8_verified.TXT';
 
 const app = express();
 
+// ✅ Sirve la carpeta index_files como recursos estáticos
+app.use('/index_files', express.static(path.join(__dirname, 'Public/index_files')));
+
+// ✅ Si tienes más recursos estáticos (imágenes, CSS globales), puedes servir toda la carpeta Public si lo deseas
+// app.use(express.static(path.join(__dirname, 'Public')));
+
+// Configuración de Multer para carga de archivos
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, carpetaUploads),
     filename: (req, file, cb) => cb(null, file.originalname)
@@ -36,12 +43,12 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     })
     .catch(err => console.error('❌ Error de conexión a MongoDB:', err));
 
-// Ruta por defecto para mostrar index.html
+// ✅ Ruta principal para servir index.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '/Public/index.html'));
+    res.sendFile(path.join(__dirname, 'Public/index.html'));
 });
 
-// Ruta adicional si quieres mantener acceso a tu plantilla anterior
+// Ruta opcional para tu plantilla Bootstrap antigua
 app.get('/cover', (req, res) => {
     res.sendFile(path.join(__dirname, 'Cover Template for Bootstrap.html'));
 });
@@ -52,6 +59,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
     res.send('Archivo recibido correctamente');
 });
 
+// 🕵️ Observa la carpeta transferencia2
 console.log(`🕵️ Observando la carpeta: ${carpetaTransferencia} ...`);
 fs.watch(carpetaTransferencia, (eventType, filename) => {
     if (filename && path.extname(filename).toLowerCase() === '.txt') {
@@ -59,6 +67,7 @@ fs.watch(carpetaTransferencia, (eventType, filename) => {
     }
 });
 
+// 🕵️ Observa la carpeta uploads y ejecuta proceso Python al recibir el archivo objetivo
 console.log(`🕵️ Observando la carpeta: ${carpetaUploads} ...`);
 
 let timer;
