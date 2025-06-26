@@ -1,3 +1,5 @@
+import sys
+
 def contar_registros(ruta):
     try:
         with open(ruta, 'r', encoding='utf-8') as archivo:
