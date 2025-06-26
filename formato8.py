@@ -1,5 +1,6 @@
 import json
 import argparse
+import sys
 
 def parse_line_to_json(line):
     values = line.strip().split(',')
@@ -61,7 +62,6 @@ def parse_line_to_json(line):
         "Profile": filtered_profile
     }
 
-
 def main():
     parser = argparse.ArgumentParser(description="Parse wave log Format 8 to JSON")
     parser.add_argument("input_file", help="Path to the input .txt file")
@@ -83,16 +83,15 @@ def main():
                 except Exception as e:
                     print(f"⚠️ Línea inválida omitida: {e}", file=sys.stderr)
 
-        print(f"CANTIDAD_REGISTROS={len(registros)}")
+        print(f"CANTIDAD_REGISTROS={len(registros)}", file=sys.stderr)
 
         for registro in registros:
             print(json.dumps(registro))
 
     except FileNotFoundError:
-        print(f"❌ Error: Archivo '{input_file}' no encontrado.")
+        print(f"❌ Error: Archivo '{input_file}' no encontrado.", file=sys.stderr)
     except Exception as e:
-        print(f"❌ Error inesperado: {e}")
-
+        print(f"❌ Error inesperado: {e}", file=sys.stderr)
 
 if __name__ == "__main__":
     main()
