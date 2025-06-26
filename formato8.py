@@ -69,19 +69,29 @@ def main():
     args = parser.parse_args()
     input_file = args.input_file
 
+    registros = []
+
     try:
         with open(input_file, 'r') as f:
             lines = f.readlines()
 
         for line in lines:
             if line.strip():
-                result = parse_line_to_json(line)
-                print(json.dumps(result, indent=2))
+                try:
+                    result = parse_line_to_json(line)
+                    registros.append(result)
+                except Exception as e:
+                    print(f"⚠️ Línea inválida omitida: {e}", file=sys.stderr)
+
+        print(f"CANTIDAD_REGISTROS={len(registros)}")
+
+        for registro in registros:
+            print(json.dumps(registro))
 
     except FileNotFoundError:
-        print(f"Error: File '{input_file}' not found.")
+        print(f"❌ Error: Archivo '{input_file}' no encontrado.")
     except Exception as e:
-        print(f"Unexpected error: {e}")
+        print(f"❌ Error inesperado: {e}")
 
 
 if __name__ == "__main__":
