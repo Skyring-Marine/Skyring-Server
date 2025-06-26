@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { MongoClient } = require('mongodb');
 
-const hostname = '192.168.1.11';
+const hostname = '192.168.0.178';
 const port = 3000;
 
 const url = 'mongodb://127.0.0.1:27017';
@@ -11,6 +11,8 @@ const dbName = 'myproject';
 
 let db;
 
+
+/*
 // Conectar a MongoDB
 MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(client => {
@@ -24,6 +26,9 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     .catch(err => {
         console.error('Error de conexión a MongoDB:', err);
     });
+
+*/
+
 
 
               // seccion para insertar objeto
@@ -159,7 +164,7 @@ async function obtenerDatosSpotter() {
 
 
 
-const carpeta = 'C:\\Users\\Asus\\OneDrive\\Desktop\\Test_ADCP';
+const carpeta = 'C:\\TRDI\\ADCP_PMEJ\\WAVES';
 
 fs.readdir(carpeta, (err, archivos) => {
   if (err) {
@@ -204,10 +209,10 @@ const FormData = require('form-data');
 
 async function enviarArchivo() {
     const form = new FormData();
-    form.append('file', fs.createReadStream('C:\\Users\\Asus\\OneDrive\\Desktop\\Test_ADCP\\camaninv17_000_000_TS1707111200_LOG8.TXT'));
+    form.append('file', fs.createReadStream('C:\\TRDI\\ADCP_PMEJ\\WAVES\\WAVES_000_000_LOG8.TXT'));
 
     try {
-        const respuesta = await axios.post('http://3.17.27.40:3000/upload', form, {
+        const respuesta = await axios.post('http://3.134.98.196:3000/upload', form, {
             headers: form.getHeaders()
         });
         console.log(respuesta.data);
