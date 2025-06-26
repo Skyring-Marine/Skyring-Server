@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => cb(null, file.originalname)
 });
 const upload = multer({ storage });
-
+ console.log('SERVER9');
 MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(client => {
         console.log('✅ Conectado a MongoDB');
