@@ -71,30 +71,26 @@ fs.watch(carpetaUploads, (eventType, filename) => {
                 return;
             }
 
-            console.log(`✅ Archivo ${filename} cambió o es nuevo. Contando registros...`);
+            console.log(`✅ Archivo ${filename} cambió o es nuevo. Analizando cantidad de registros...`);
 
             try {
                 const contenido = fs.readFileSync(fullPath, 'utf-8');
-
-                const posiblesLineas = contenido.split(/\r?\n/);
-                const lineasValidas = posiblesLineas.filter(line => {
-                    const primerElemento = line.trim().split(',')[0];
-                    return /^\d+$/.test(primerElemento);
-                });
-
-                console.log(`📊 El archivo ${filename} contiene ${lineasValidas.length} registros válidos.`);
-
+                const lineas = contenido.split(/\r?\n/);
+                const lineasValidas = lineas.filter(l => l.trim().length > 0);
+                
+                console.log(`📊 Total de registros detectados: ${lineasValidas.length}`);
+                
                 await db.collection('archivosProcesados').updateOne(
                     { nombreArchivo: filename },
-                    { $set: { hash: hashActual, fecha: new Date() } },
+                    { $set: { hash: hashActual, fecha: new Date(), total_registros: lineasValidas.length } },
                     { upsert: true }
                 );
-                console.log(`✅ Hash del archivo ${filename} actualizado en la base de datos.`);
 
-            } catch (e) {
-                console.error(`❌ Error leyendo el archivo ${filename}:`, e.message);
+                console.log(`✅ Hash y cantidad de registros actualizados en la base de datos.`);
+
+            } catch (errLectura) {
+                console.error(`❌ Error leyendo o procesando el archivo: ${errLectura.message}`);
             }
-
         })
         .catch(err => console.error(`❌ Error al calcular hash de ${filename}:`, err.message));
 });
