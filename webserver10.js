@@ -1,3 +1,4 @@
+// Ya tienes esto
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -17,13 +18,11 @@ const archivoObjetivo = 'WAVES_000_000_LOG8_verified.TXT';
 
 const app = express();
 
-// ✅ Sirve la carpeta index_files como recursos estáticos
+// ✅ Solo añadimos el servido de imágenes y recursos front
 app.use('/index_files', express.static(path.join(__dirname, 'Public/index_files')));
+app.use('/images', express.static(path.join(__dirname, 'Public/images')));
 
-// ✅ Si tienes más recursos estáticos (imágenes, CSS globales), puedes servir toda la carpeta Public si lo deseas
-// app.use(express.static(path.join(__dirname, 'Public')));
-
-// Configuración de Multer para carga de archivos
+// Mantienes todo lo que ya tenías
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, carpetaUploads),
     filename: (req, file, cb) => cb(null, file.originalname)
@@ -43,23 +42,23 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     })
     .catch(err => console.error('❌ Error de conexión a MongoDB:', err));
 
-// ✅ Ruta principal para servir index.html
+// Ruta principal
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'Public/index.html'));
 });
 
-// Ruta opcional para tu plantilla Bootstrap antigua
+// Ruta opcional para Cover anterior
 app.get('/cover', (req, res) => {
     res.sendFile(path.join(__dirname, 'Cover Template for Bootstrap.html'));
 });
 
-// Ruta para subir archivos
+// Ruta para upload
 app.post('/upload', upload.single('file'), (req, res) => {
     console.log('📁 Archivo recibido:', req.file.originalname);
     res.send('Archivo recibido correctamente');
 });
 
-// 🕵️ Observa la carpeta transferencia2
+// Watcher transferencia2
 console.log(`🕵️ Observando la carpeta: ${carpetaTransferencia} ...`);
 fs.watch(carpetaTransferencia, (eventType, filename) => {
     if (filename && path.extname(filename).toLowerCase() === '.txt') {
@@ -67,7 +66,7 @@ fs.watch(carpetaTransferencia, (eventType, filename) => {
     }
 });
 
-// 🕵️ Observa la carpeta uploads y ejecuta proceso Python al recibir el archivo objetivo
+// Watcher uploads y proceso Python
 console.log(`🕵️ Observando la carpeta: ${carpetaUploads} ...`);
 
 let timer;
