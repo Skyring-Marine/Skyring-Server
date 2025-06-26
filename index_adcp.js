@@ -209,7 +209,7 @@ const FormData = require('form-data');
 
 async function enviarArchivo() {
     const form = new FormData();
-    form.append('file', fs.createReadStream('C:\\TRDI\\ADCP_PMEJ\\WAVES\\WAVES_000_000_LOG8.TXT'));
+    form.append('file', fs.createReadStream('C:\\TRDI\\ADCP_PMEJ\\WAVES\\WAVES_000_000_LOG8_verified.TXT'));
 
     try {
         const respuesta = await axios.post('http://3.134.98.196:3000/upload', form, {
