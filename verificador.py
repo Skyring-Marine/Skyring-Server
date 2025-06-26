@@ -1,7 +1,7 @@
 import sys
 import os
 
-def contar_y_normalizar_registros(ruta_archivo):
+def insertar_separadores(ruta_archivo):
     try:
         with open(ruta_archivo, 'r', encoding='utf-8') as archivo:
             lineas = archivo.readlines()
@@ -13,10 +13,11 @@ def contar_y_normalizar_registros(ruta_archivo):
 
         with open(nombre_salida, 'w', encoding='utf-8') as archivo_salida:
             for linea in lineas:
-                linea = linea.rstrip('\n')  # Elimina cualquier salto de línea residual
+                linea = linea.rstrip('\n')  # Limpiar salto de línea existente
                 archivo_salida.write(linea + '\n')
+                archivo_salida.write('<FINISH>\n')  # Separador entre registros
 
-        print(f'Archivo corregido generado: {nombre_salida}')
+        print(f'✅ Archivo corregido generado: {nombre_salida}')
 
     except FileNotFoundError:
         print(f'❌ El archivo {ruta_archivo} no se encontró.')
@@ -31,7 +32,7 @@ def generar_nombre_salida(ruta_original):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Uso: python contar_y_normalizar.py ruta_del_archivo")
+        print("Uso: python insertar_separadores.py ruta_del_archivo")
     else:
         ruta = sys.argv[1]
-        contar_y_normalizar_registros(ruta)
+        insertar_separadores(ruta)
