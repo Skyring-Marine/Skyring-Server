@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const { MongoClient } = require('mongodb');
 const multer = require('multer');
-const crypto = require('crypto');
 
 const hostname = '172.31.39.213';
 const port = 3000;
@@ -23,7 +22,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-console.log('SERVER AJUSTADO');
+console.log('SERVER LIMPIO');
 
 MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(client => {
@@ -51,58 +50,10 @@ fs.watch(carpetaTransferencia, (eventType, filename) => {
 });
 
 console.log(`🕵️ Observando la carpeta: ${carpetaUploads} ...`);
-const archivosProcesados = new Set();
 
 fs.watch(carpetaUploads, (eventType, filename) => {
     if (!filename) return;
     if (filename !== archivoObjetivo) return;
 
-    const fullPath = path.join(carpetaUploads, filename);
-    if (archivosProcesados.has(fullPath)) return;
-
-    archivosProcesados.add(fullPath);
-    setTimeout(() => archivosProcesados.delete(fullPath), 3000);
-
-    console.log(`📄 Detectado archivo objetivo en uploads ${eventType}: ${filename}`);
-
-    calcularHashArchivo(fullPath)
-        .then(async (hashActual) => {
-            const registroArchivo = await db.collection('archivosProcesados').findOne({ nombreArchivo: filename });
-            if (registroArchivo && registroArchivo.hash === hashActual) {
-                console.log(`⚠️ Archivo ${filename} NO cambió. Saltando procesamiento.`);
-                return;
-            }
-
-            console.log(`✅ Archivo ${filename} cambió o es nuevo. Analizando cantidad de registros...`);
-
-            try {
-                const contenido = fs.readFileSync(fullPath, 'utf-8');
-                
-                const registros = contenido.split('<FINISH>').filter(r => r.trim().length > 0);
-                
-                console.log(`📊 Total de registros detectados: ${registros.length}`);
-                
-                await db.collection('archivosProcesados').updateOne(
-                    { nombreArchivo: filename },
-                    { $set: { hash: hashActual, fecha: new Date(), total_registros: registros.length } },
-                    { upsert: true }
-                );
-
-                console.log(`✅ Hash y cantidad de registros actualizados en la base de datos.`);
-
-            } catch (errLectura) {
-                console.error(`❌ Error leyendo o procesando el archivo: ${errLectura.message}`);
-            }
-        })
-        .catch(err => console.error(`❌ Error al calcular hash de ${filename}:`, err.message));
+    console.log(`📁 Archivo recibido en uploads ${eventType}: ${filename}`);
 });
-
-function calcularHashArchivo(ruta) {
-    return new Promise((resolve, reject) => {
-        const hash = crypto.createHash('sha256');
-        const stream = fs.createReadStream(ruta);
-        stream.on('data', chunk => hash.update(chunk));
-        stream.on('end', () => resolve(hash.digest('hex')));
-        stream.on('error', err => reject(err));
-    });
-}
