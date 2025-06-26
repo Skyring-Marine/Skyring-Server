@@ -13,7 +13,7 @@ let db;
 
 const carpetaTransferencia = path.join(__dirname, 'transferencia2');
 const carpetaUploads = path.join(__dirname, 'uploads');
-const archivoWaves = 'WAVES_000_000_LOG8.TXT';
+const archivoObjetivo = 'WAVES_000_000_LOG8_verified.TXT';  // Ya viene con _verified
 
 const app = express();
 
@@ -22,7 +22,9 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => cb(null, file.originalname)
 });
 const upload = multer({ storage });
- console.log('SERVER9');
+
+console.log('SERVER AJUSTADO');
+
 MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(client => {
         console.log('✅ Conectado a MongoDB');
@@ -53,7 +55,7 @@ const archivosProcesados = new Set();
 
 fs.watch(carpetaUploads, (eventType, filename) => {
     if (!filename) return;
-    if (filename.toUpperCase() !== archivoWaves) return;
+    if (filename !== archivoObjetivo) return;
 
     const fullPath = path.join(carpetaUploads, filename);
     if (archivosProcesados.has(fullPath)) return;
@@ -75,14 +77,14 @@ fs.watch(carpetaUploads, (eventType, filename) => {
 
             try {
                 const contenido = fs.readFileSync(fullPath, 'utf-8');
-                const lineas = contenido.split(/\r?\n/);
-                const lineasValidas = lineas.filter(l => l.trim().length > 0);
                 
-                console.log(`📊 Total de registros detectados: ${lineasValidas.length}`);
+                const registros = contenido.split('<FINISH>').filter(r => r.trim().length > 0);
+                
+                console.log(`📊 Total de registros detectados: ${registros.length}`);
                 
                 await db.collection('archivosProcesados').updateOne(
                     { nombreArchivo: filename },
-                    { $set: { hash: hashActual, fecha: new Date(), total_registros: lineasValidas.length } },
+                    { $set: { hash: hashActual, fecha: new Date(), total_registros: registros.length } },
                     { upsert: true }
                 );
 
