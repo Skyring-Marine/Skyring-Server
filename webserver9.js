@@ -36,18 +36,13 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     })
     .catch(err => console.error('❌ Error de conexión a MongoDB:', err));
 
-// Sirve index.html desde la raíz del proyecto
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'Cover Template for Bootstrap.html')));
 
-// Endpoint para recibir archivos vía POST
 app.post('/upload', upload.single('file'), (req, res) => {
     console.log('📁 Archivo recibido:', req.file.originalname);
     res.send('Archivo recibido correctamente');
 });
 
-// Monitoreo de carpeta transferencia2
 console.log(`🕵️ Observando la carpeta: ${carpetaTransferencia} ...`);
 fs.watch(carpetaTransferencia, (eventType, filename) => {
     if (filename && path.extname(filename).toLowerCase() === '.txt') {
@@ -55,7 +50,6 @@ fs.watch(carpetaTransferencia, (eventType, filename) => {
     }
 });
 
-// Monitoreo de carpeta uploads
 console.log(`🕵️ Observando la carpeta: ${carpetaUploads} ...`);
 
 let timer;
