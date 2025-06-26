@@ -26,7 +26,7 @@ fs.watch(carpeta, (eventType, filename) => {
 });
 
 function ejecutarVerificador(rutaArchivo) {
-    const comando = `python verificar.py "${rutaArchivo}"`;
+    const comando = `python verificador.py "${rutaArchivo}"`;
 
     exec(comando, (error, stdout, stderr) => {
         if (error) return console.error(`❌ Error ejecutando verificador: ${error.message}`);
