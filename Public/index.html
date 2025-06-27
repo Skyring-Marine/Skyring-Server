@@ -12,21 +12,30 @@
   <link href="./index_files/bootstrap.min.css" rel="stylesheet">
   <link href="./index_files/cover.css" rel="stylesheet">
 
-  <!-- Fondo personalizado con mar.jpg y estilos adicionales -->
   <style>
     body {
       background-image: url('/images/mar.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
+      background-color: rgba(255, 255, 255, 0.1); /* Para pequeñas translucencias sobre el fondo */
+      background-blend-mode: lighten;
     }
+
     .logo-img {
-      width: 450px; /* Agrandado x3 */
+      width: 450px;
       height: auto;
       margin-bottom: 20px;
     }
-    .inner.cover {
-      margin-top: -100px; /* Subir el contenido */
+
+    .section-content {
+      margin-top: -50px; /* Ajusta altura, más o menos según necesidad */
+    }
+
+    .cover-heading {
+      color: #fff;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4); /* Contorno leve para resaltar sin exagerar */
+      margin-bottom: 20px;
     }
   </style>
 </head>
@@ -46,13 +55,17 @@
   </header>
 
   <main role="main" class="inner cover">
-    <img src="/images/logo.png" alt="Logo de la empresa" class="logo-img">
+    
+    <section class="section-content">
+      <img src="/images/logo.png" alt="Logo de la empresa" class="logo-img">
 
-    <h1 class="cover-heading">Wave Monitoring System</h1>
-    <p class="lead"></p>
-    <p class="lead">
-      <a href="#" class="btn btn-lg btn-secondary">Learn more</a>
-    </p>
+      <h1 class="cover-heading">Wave Monitoring System</h1>
+      
+      <p class="lead">
+        <a href="#" class="btn btn-lg btn-secondary">Login</a>
+      </p>
+    </section>
+
   </main>
 
   <footer class="mastfoot mt-auto">
