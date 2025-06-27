@@ -12,7 +12,7 @@
   <link href="./index_files/bootstrap.min.css" rel="stylesheet">
   <link href="./index_files/cover.css" rel="stylesheet">
 
-  <!-- Fondo personalizado con mar.jpg -->
+  <!-- Fondo personalizado con mar.jpg y estilos adicionales -->
   <style>
     body {
       background-image: url('/images/mar.jpg');
@@ -21,9 +21,12 @@
       background-repeat: no-repeat;
     }
     .logo-img {
-      width: 150px;
+      width: 450px; /* Agrandado x3 */
       height: auto;
       margin-bottom: 20px;
+    }
+    .inner.cover {
+      margin-top: -100px; /* Subir el contenido */
     }
   </style>
 </head>
@@ -43,7 +46,6 @@
   </header>
 
   <main role="main" class="inner cover">
-    <!-- Logo de la empresa arriba del título -->
     <img src="/images/logo.png" alt="Logo de la empresa" class="logo-img">
 
     <h1 class="cover-heading">Wave Monitoring System</h1>
