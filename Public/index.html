@@ -18,7 +18,7 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      background-color: rgba(255, 255, 255, 0.13); /* Pequeña translucencia */
+      background-color: rgba(255, 255, 255, 0.13);
       background-blend-mode: lighten;
     }
 
@@ -29,7 +29,7 @@
     }
 
     .section-content {
-      margin-top: 50px; /* Controlas cuánto sube, más valor = más abajo */
+      margin-top: 50px;
     }
 
     .cover-heading {
@@ -42,7 +42,6 @@
 
 <body class="text-center">
 
-<!-- Alineamos arriba usando justify-content-start -->
 <div class="cover-container d-flex h-100 p-3 mx-auto flex-column justify-content-start">
   <header class="masthead mb-auto">
     <div class="inner">
@@ -57,11 +56,11 @@
 
   <main role="main" class="inner cover">
     
-    <section class="section-content">
-      <img src="/images/logo.png" alt="Logo de la empresa" class="logo-img">
+    <section class="section-content" id="content-section">
+      <img src="/images/logo.png" alt="Logo de la empresa" class="logo-img" id="logo-img">
       <h1 class="cover-heading">Wave Monitoring System</h1>
       <p class="lead">
-        <a href="#" class="btn btn-lg btn-secondary">Login</a>
+        <a href="#" class="btn btn-lg btn-secondary" id="login-btn">Login</a>
       </p>
     </section>
 
@@ -77,6 +76,33 @@
 <script src="./index_files/jquery-3.2.1.slim.min.js"></script>
 <script src="./index_files/popper.min.js"></script>
 <script src="./index_files/bootstrap.min.js"></script>
+
+<script>
+  document.getElementById('login-btn').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    // Ocultamos logo y botón
+    document.getElementById('logo-img').style.display = 'none';
+    document.getElementById('login-btn').style.display = 'none';
+
+    // Creamos el formulario
+    const section = document.getElementById('content-section');
+    const form = document.createElement('form');
+    form.className = 'mt-4';
+
+    form.innerHTML = `
+      <div class="form-group">
+        <input type="text" class="form-control" placeholder="Username" required>
+      </div>
+      <div class="form-group">
+        <input type="password" class="form-control" placeholder="Password" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Submit</button>
+    `;
+
+    section.appendChild(form);
+  });
+</script>
 
 </body>
 </html>
