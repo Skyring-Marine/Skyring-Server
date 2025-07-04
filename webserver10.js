@@ -70,7 +70,7 @@ fs.watch(carpetaTransferencia, (eventType, filename) => {
 console.log(`🕵️ Observando la carpeta: ${carpetaUploads} ...`);
 
 let timer;
-let procesando = false; // 🔒 Bloqueo de procesos simultáneos
+let procesando = false;
 
 fs.watch(carpetaUploads, (eventType, filename) => {
     if (!filename) return;
@@ -86,7 +86,7 @@ fs.watch(carpetaUploads, (eventType, filename) => {
             return;
         }
 
-        procesando = true; // 🚧 Bloqueamos nuevos procesos
+        procesando = true;
 
         const fullPath = path.join(carpetaUploads, filename);
         console.log(`🚀 Ejecutando verificación externa sobre: ${filename}`);
@@ -101,22 +101,28 @@ fs.watch(carpetaUploads, (eventType, filename) => {
                 console.error(`⚠️ STDERR: ${stderr}`);
             }
             if (stdout) {
-                console.log(`📊 Verificación Python: ${stdout.trim()}`);
+                console.log(`📊 Verificación Python recibida:`);
 
                 const lineas = stdout.trim().split('\n');
+                console.log(`🔢 Total de líneas detectadas: ${lineas.length}`);
 
                 lineas.forEach(registro => {
                     const datos = registro.split(',').map(d => d.trim());
-                    if (datos.length < 16) {
-                        console.error('❌ Registro inválido, faltan datos:', registro);
+
+                    if (datos.length < 16 || isNaN(parseFloat(datos[0]))) {
+                        console.log(`ℹ️ Línea ignorada (control o inválida): ${registro}`);
                         return;
                     }
 
                     const profile = [];
                     for (let i = 16; i < datos.length - 1; i += 2) {
+                        const mag = parseFloat(datos[i]);
+                        const dir = parseFloat(datos[i + 1]);
+                        if (isNaN(mag) || isNaN(dir)) continue;
+
                         profile.push({
-                            Magnitude: parseFloat(datos[i]),
-                            Direction: parseFloat(datos[i + 1])
+                            Magnitude: mag,
+                            Direction: dir
                         });
                     }
 
@@ -142,16 +148,22 @@ fs.watch(carpetaUploads, (eventType, filename) => {
                         n_registro: parseInt(datos[0])
                     };
 
+                    // Validación rápida de campos críticos antes de insertar
+                    if (isNaN(doc.Hs) || isNaN(doc.Tp) || isNaN(doc.Depth) || isNaN(doc.n_registro)) {
+                        console.error(`❌ Registro inválido, campos numéricos corruptos:`, registro);
+                        return;
+                    }
+
                     db.collection('registros').insertOne(doc)
-                        .then(() => console.log('✅ Registro insertado en MongoDB:', doc.n_registro))
-                        .catch(err => console.error('❌ Error insertando en MongoDB:', err));
+                        .then(() => console.log(`✅ Registro ${doc.n_registro} insertado correctamente en MongoDB`))
+                        .catch(err => console.error(`❌ Error insertando en MongoDB registro ${doc.n_registro}:`, err));
                 });
 
-                console.log(`✅ Proceso terminado con éxito.`);
-                console.log(`🕐 Esperando actualización de archivo...`);
+                console.log(`✅ Proceso completo. Esperando nuevos archivos...`);
             }
 
-            procesando = false; // 🔓 Liberamos el bloqueo al terminar todo
+            procesando = false;
         });
+
     }, 2000);
 });
